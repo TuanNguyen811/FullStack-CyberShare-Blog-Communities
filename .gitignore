@@ -1,0 +1,106 @@
+# ============================================
+# Backend (Spring Boot - server/)
+# ============================================
+server/HELP.md
+server/target/
+server/.mvn/wrapper/maven-wrapper.jar
+!server/**/src/main/**/target/
+!server/**/src/test/**/target/
+
+### STS ###
+server/.apt_generated
+server/.classpath
+server/.factorypath
+server/.project
+server/.settings
+server/.springBeans
+server/.sts4-cache
+
+### IntelliJ IDEA ###
+server/.idea
+server/*.iws
+server/*.iml
+server/*.ipr
+
+### NetBeans ###
+server/nbproject/private/
+server/nbbuild/
+server/dist/
+server/nbdist/
+server/.nb-gradle/
+server/build/
+!server/**/src/main/**/build/
+!server/**/src/test/**/build/
+
+# ============================================
+# Frontend (React + Vite - client/)
+# ============================================
+# Dependencies
+client/node_modules/
+client/.pnp
+client/.pnp.js
+
+# Testing
+client/coverage/
+
+# Production build
+client/dist/
+client/build/
+
+# Misc
+client/.DS_Store
+client/.env.local
+client/.env.development.local
+client/.env.test.local
+client/.env.production.local
+
+# Logs
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/pnpm-debug.log*
+client/lerna-debug.log*
+
+# Editor directories and files
+client/.vscode/*
+!client/.vscode/extensions.json
+client/.idea
+client/*.suo
+client/*.ntvs*
+client/*.njsproj
+client/*.sln
+client/*.sw?
+
+# Vite
+client/.vite
+
+# ============================================
+# Shared / Root Level
+# ============================================
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Uploads (user-generated content)
+server/uploads/
+uploads/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
