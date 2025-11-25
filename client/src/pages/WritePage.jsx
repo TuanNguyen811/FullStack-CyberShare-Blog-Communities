@@ -10,8 +10,10 @@ import { Save, Send, X, Upload, Image as ImageIcon } from 'lucide-react';
 export default function WritePage() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  
+
   const [title, setTitle] = useState('');
+  const [summary, setSummary] = useState('');
+  const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
@@ -20,7 +22,7 @@ export default function WritePage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const coverImageInputRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -145,9 +147,14 @@ export default function WritePage() {
     setError('');
 
     try {
+      // Parse hashtags: extract words starting with # and remove the # prefix
+      const parsedTags = tags.match(/#[\w\u00C0-\u024F]+/g)?.map(t => t.slice(1)) || [];
+      
       const postData = {
         title: title.trim(),
         content: content.trim(),
+        summary: summary.trim(),
+        tags: parsedTags,
         categoryId: categoryId ? parseInt(categoryId) : null,
         coverImageUrl: coverImageUrl.trim() || null,
         status: 'DRAFT',
@@ -178,9 +185,14 @@ export default function WritePage() {
     setError('');
 
     try {
+      // Parse hashtags: extract words starting with # and remove the # prefix
+      const parsedTags = tags.match(/#[\w\u00C0-\u024F]+/g)?.map(t => t.slice(1)) || [];
+      
       const postData = {
         title: title.trim(),
         content: content.trim(),
+        summary: summary.trim(),
+        tags: parsedTags,
         categoryId: categoryId ? parseInt(categoryId) : null,
         coverImageUrl: coverImageUrl.trim() || null,
         status: 'PUBLISHED',
@@ -224,6 +236,18 @@ export default function WritePage() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
               className="w-full text-4xl font-bold border-none outline-none focus:ring-0 placeholder-gray-300"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Summary */}
+          <div>
+            <textarea
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="Write a short summary..."
+              className="w-full text-xl text-gray-600 border-none outline-none focus:ring-0 placeholder-gray-300 resize-none"
+              rows={2}
               disabled={loading}
             />
           </div>
@@ -292,14 +316,23 @@ export default function WritePage() {
 
           {/* Markdown Editor */}
           <div className="border-t pt-6">
-            <p className="text-sm text-gray-600 mb-2">
-              💡 Tip: Click the upload icon in the toolbar to insert images into your content
-            </p>
             <SimpleMDE
               value={content}
               onChange={setContent}
               options={editorOptions}
               ref={editorRef}
+            />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="#tag1 #tag2 #tag3..."
+              className="w-full text-lg text-gray-600 border-none outline-none focus:ring-0 placeholder-gray-300"
+              disabled={loading}
             />
           </div>
 

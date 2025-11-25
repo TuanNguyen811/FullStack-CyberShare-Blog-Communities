@@ -4,8 +4,14 @@ import com.server.server.domain.User;
 import com.server.server.dto.user.UpdateProfileRequest;
 import com.server.server.dto.user.UserDto;
 import com.server.server.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -26,6 +32,19 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
         return UserDto.fromEntity(user);
+    }
+
+    public List<UserDto> getTopAuthors(int limit) {
+        return userRepository.findTopAuthors(PageRequest.of(0, limit))
+                .stream()
+                .map(UserDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public Page<UserDto> searchUsers(String query, Pageable pageable) {
+        Page<User> users = userRepository.findByUsernameContainingIgnoreCaseOrDisplayNameContainingIgnoreCase(
+                query, query, pageable);
+        return users.map(UserDto::fromEntity);
     }
 
     @Transactional

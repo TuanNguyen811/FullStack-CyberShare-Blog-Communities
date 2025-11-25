@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import apiClient from '@/lib/api';
-import { PenSquare, Trash2, Eye, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
+import PostCard from '@/components/PostCard';
+import { PenSquare, Trash2 } from 'lucide-react';
 
 export default function DashboardPage() {
   const { isAuthenticated } = useAuth();
@@ -49,23 +49,6 @@ export default function DashboardPage() {
     } catch (err) {
       console.error('Failed to delete post:', err);
       alert('Failed to delete post');
-    }
-  };
-
-  const getStatusBadgeColor = (status) => {
-    switch (status) {
-      case 'PUBLISHED':
-        return 'bg-green-100 text-green-800';
-      case 'DRAFT':
-        return 'bg-gray-100 text-gray-800';
-      case 'PENDING_REVIEW':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'ARCHIVED':
-        return 'bg-red-100 text-red-800';
-      case 'HIDDEN':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -161,59 +144,23 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-4">
             {posts.map((post) => (
-              <div
-                key={post.id}
-                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h2 className="text-2xl font-bold hover:text-blue-600">
-                        <Link to={`/post/${post.slug}`}>{post.title}</Link>
-                      </h2>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
-                          post.status
-                        )}`}
-                      >
-                        {post.status.replace('_', ' ')}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      {post.categoryName && (
-                        <span className="flex items-center">
-                          <span className="font-medium">{post.categoryName}</span>
-                        </span>
-                      )}
-                      <span className="flex items-center">
-                        <Eye className="h-4 w-4 mr-1" />
-                        {post.views} views
-                      </span>
-                      <span className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {post.publishedAt
-                          ? format(new Date(post.publishedAt), 'MMM dd, yyyy')
-                          : format(new Date(post.createdAt), 'MMM dd, yyyy')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2 ml-4">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to={`/edit/${post.id}`}>
-                        <PenSquare className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(post.id, post.title)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+              <div key={post.id} className="relative">
+                <PostCard post={post} />
+                {/* Action buttons overlay */}
+                <div className="absolute top-4 right-4 flex items-center space-x-2 bg-white/90 rounded-lg p-1">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to={`/edit/${post.id}`}>
+                      <PenSquare className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(post.id, post.title)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}

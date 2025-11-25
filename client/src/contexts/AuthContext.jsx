@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/lib/authService';
+import apiClient from '@/lib/api';
 
 const AuthContext = createContext(null);
 
@@ -52,6 +53,30 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const setTokensFromOAuth = async (accessToken, refreshToken) => {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    
+    try {
+      // Fetch user profile from backend
+      const response = await apiClient.get('/api/users/me');
+      const userData = {
+        id: response.data.id,
+        username: response.data.username,
+        email: response.data.email,
+        displayName: response.data.displayName,
+        role: response.data.role,
+        avatarUrl: response.data.avatarUrl,
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to fetch user after OAuth:', error);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    }
+  };
+
   const updateUser = (patch) => {
     setUser((prev) => {
       const updated = { ...(prev || {}), ...(patch || {}) };
@@ -70,6 +95,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUser,
+    setTokensFromOAuth,
     isAuthenticated: !!user,
     loading,
   };

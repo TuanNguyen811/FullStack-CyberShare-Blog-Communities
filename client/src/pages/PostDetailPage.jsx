@@ -7,22 +7,47 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
-import { Calendar, Eye, Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { Calendar, Eye, Edit, Trash2, ArrowLeft, Heart, Bookmark, MessageSquare, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { useInteractions } from '@/hooks/useInteractions';
+import CommentsSection from '@/components/CommentsSection';
+import FollowButton from '@/components/FollowButton';
+import SimilarPosts from '@/components/SimilarPosts';
 
 export default function PostDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
 
+  const {
+    liked,
+    bookmarked,
+    likesCount,
+    bookmarksCount,
+    commentsCount,
+    handleLike,
+    handleBookmark,
+    incrementComments,
+    decrementComments,
+  } = useInteractions(post?.id);
+
   useEffect(() => {
     fetchPost();
   }, [slug]);
+
+  useEffect(() => {
+    if (post?.id) {
+      // Increment view count
+      apiClient.post(`/api/posts/${post.id}/view`).catch(err => {
+        console.error('Failed to increment view count:', err);
+      });
+    }
+  }, [post?.id]);
 
   const fetchPost = async () => {
     try {
@@ -83,122 +108,152 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Cover Image */}
-      {post.coverImageUrl && (
-        <div className="w-full h-96 bg-gray-200">
-          <img
-            src={post.coverImageUrl}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
+    <div className="min-h-screen bg-white">
       {/* Content */}
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <article className="bg-white rounded-lg shadow-sm p-8">
+      <div className="max-w-3xl mx-auto px-6 py-12">
+        <article>
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+            <Link to="/" className="hover:text-gray-900 transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            {post.categoryName && (
+              <>
+                <Link
+                  to={`/?category=${post.categoryId}`}
+                  className="hover:text-gray-900 transition-colors"
+                >
+                  {post.categoryName}
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+              </>
+            )}
+            <span className="text-gray-900 font-medium truncate">{post.title}</span>
+          </nav>
+
           {/* Header */}
-          <header className="mb-8 border-b pb-6">
-            <div className="flex items-center justify-between mb-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate(-1)}
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
-
-              {isAuthor && (
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate(`/edit/${post.id}`)}
-                    className="gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="gap-2"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {deleting ? 'Deleting...' : 'Delete'}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <header className="mb-8">
+            {/* Title */}
+            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
               {post.title}
             </h1>
 
-            {/* Author Info */}
-            <div className="flex items-center gap-4 mb-4">
-              <Link
-                to={`/author/${post.authorUsername}`}
-                className="flex items-center gap-3 hover:opacity-80"
-              >
-                {post.authorAvatarUrl ? (
-                  <img
-                    src={post.authorAvatarUrl}
-                    alt={post.authorDisplayName}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                    {post.authorDisplayName?.charAt(0) || 'U'}
+            {/* Summary */}
+            {post.summary && (
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                {post.summary}
+              </p>
+            )}
+
+            {/* Author & Follow */}
+            <div className="flex items-center justify-between mb-6 pb-6 border-b">
+              <div className="flex items-center gap-4">
+                <Link
+                  to={`/author/${post.authorUsername}`}
+                  className="flex items-center gap-3 hover:opacity-80"
+                >
+                  {post.authorAvatarUrl ? (
+                    <img
+                      src={post.authorAvatarUrl}
+                      alt={post.authorDisplayName}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+                      {post.authorDisplayName?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {post.authorDisplayName}
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      {post.publishedAt && (
+                        <time dateTime={post.publishedAt}>
+                          {format(new Date(post.publishedAt), 'MMM dd, yyyy')}
+                        </time>
+                      )}
+                      <span>·</span>
+                      <span>{Math.ceil((post.content?.length || 0) / 1000)} min read</span>
+                    </div>
                   </div>
-                )}
-                <div>
-                  <p className="font-semibold text-gray-900">
-                    {post.authorDisplayName}
-                  </p>
-                  <p className="text-sm text-gray-500">@{post.authorUsername}</p>
-                </div>
-              </Link>
+                </Link>
+              </div>
+
+              {!isAuthor && (
+                <FollowButton username={post.authorUsername} variant="default" className="rounded-full" />
+              )}
             </div>
 
-            {/* Metadata */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-              {post.publishedAt && (
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <time dateTime={post.publishedAt}>
-                    {format(new Date(post.publishedAt), 'MMM dd, yyyy')}
-                  </time>
-                </div>
-              )}
-              <div className="flex items-center gap-1">
-                <Eye className="h-4 w-4" />
-                <span>{post.views.toLocaleString()} views</span>
+            {/* Interaction Bar */}
+            <div className="flex items-center justify-between py-4 border-y">
+              <div className="flex items-center gap-6">
+                {/* Like */}
+                <button
+                  onClick={handleLike}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  disabled={!user}
+                >
+                  <Heart className={`w-6 h-6 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                  <span className="text-sm">{likesCount}</span>
+                </button>
+
+                {/* Comment */}
+                <button
+                  onClick={() => document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <MessageSquare className="w-6 h-6" />
+                  <span className="text-sm">{commentsCount}</span>
+                </button>
               </div>
-              {post.categoryName && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                  {post.categoryName}
-                </span>
-              )}
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  post.status === 'PUBLISHED'
-                    ? 'bg-green-100 text-green-800'
-                    : post.status === 'DRAFT'
-                    ? 'bg-gray-100 text-gray-800'
-                    : post.status === 'PENDING_REVIEW'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : post.status === 'ARCHIVED'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-orange-100 text-orange-800'
-                }`}
-              >
-                {post.status.replace('_', ' ')}
-              </span>
+
+              <div className="flex items-center gap-4">
+                {/* Bookmark */}
+                <button
+                  onClick={handleBookmark}
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  disabled={!user}
+                  title={bookmarked ? 'Remove bookmark' : 'Bookmark this post'}
+                >
+                  <Bookmark className={`w-6 h-6 ${bookmarked ? 'fill-current' : ''}`} />
+                </button>
+
+                {/* Edit (for author) */}
+                {isAuthor && (
+                  <>
+                    <button
+                      onClick={() => navigate(`/edit/${post.id}`)}
+                      className="text-gray-600 hover:text-gray-900 transition-colors"
+                      title="Edit post"
+                    >
+                      <Edit className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="text-gray-600 hover:text-red-600 transition-colors"
+                      title="Delete post"
+                    >
+                      <Trash2 className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </header>
+
+          {/* Cover Image */}
+          {post.coverImageUrl && (
+            <div className="w-full mb-12">
+              <img
+                src={post.coverImageUrl}
+                alt={post.title}
+                className="w-full h-auto rounded-lg"
+              />
+            </div>
+          )}
 
           {/* Content */}
           <div className="prose prose-lg prose-slate max-w-none
@@ -206,16 +261,16 @@ export default function PostDetailPage() {
             prose-h1:text-4xl prose-h1:mb-4
             prose-h2:text-3xl prose-h2:mb-3 prose-h2:mt-8
             prose-h3:text-2xl prose-h3:mb-2 prose-h3:mt-6
-            prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4
+            prose-p:text-gray-800 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-xl
             prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
             prose-strong:text-gray-900 prose-strong:font-semibold
             prose-code:text-red-600 prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-['']
             prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
             prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-4
             prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-4
-            prose-li:text-gray-700 prose-li:mb-2
+            prose-li:text-gray-800 prose-li:mb-2 prose-li:text-xl
             prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600
-            prose-img:rounded-lg prose-img:shadow-md
+            prose-img:rounded-lg prose-img:w-full prose-img:my-8
             prose-hr:border-gray-300 prose-hr:my-8
             prose-table:border-collapse prose-table:w-full
             prose-th:border prose-th:border-gray-300 prose-th:bg-gray-50 prose-th:p-2 prose-th:text-left
@@ -228,14 +283,44 @@ export default function PostDetailPage() {
               {post.content}
             </ReactMarkdown>
           </div>
+
+          {/* Tags & Category */}
+          {(post.categoryName || (post.tags && post.tags.length > 0)) && (
+            <div className="flex flex-wrap items-center gap-2 mt-12 pt-8 border-t">
+              {post.categoryName && (
+                <Link 
+                  to={`/category/${post.categorySlug || post.categoryName.toLowerCase()}`}
+                  className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors"
+                >
+                  {post.categoryName}
+                </Link>
+              )}
+              {post.tags && post.tags.length > 0 && post.tags.map(tag => (
+                <Link 
+                  key={tag.id || tag.name} 
+                  to={`/tag/${tag.slug || tag.name}`}
+                  className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors"
+                >
+                  #{tag.name || tag}
+                </Link>
+              ))}
+            </div>
+          )}
         </article>
 
-        {/* Related Posts Section - Placeholder */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">More from {post.authorDisplayName}</h2>
-          <div className="text-gray-500 text-center py-8">
-            Related posts coming soon...
-          </div>
+        {/* Similar Posts */}
+        <SimilarPosts postId={post.id} />
+
+        {/* Comments Section */}
+        <div id="comments-section" className="mt-16">
+          <CommentsSection
+            postId={post.id}
+            slug={slug}
+            onCommentCountChange={(delta) => {
+              if (delta > 0) incrementComments();
+              else decrementComments(Math.abs(delta));
+            }}
+          />
         </div>
       </div>
     </div>

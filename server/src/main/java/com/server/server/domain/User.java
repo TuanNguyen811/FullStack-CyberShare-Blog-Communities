@@ -39,9 +39,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank
     @Size(max = 255)
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash")
     private String passwordHash;
 
     @Size(max = 100)
@@ -67,6 +66,18 @@ public class User {
     @Column(nullable = false, length = 20)
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", nullable = false, length = 20)
+    @Builder.Default
+    private AuthProvider authProvider = AuthProvider.local;
+
+    @Column(name = "provider_id")
+    private String providerId;
+
+    @Column(name = "email_verified")
+    @Builder.Default
+    private Boolean emailVerified = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -3,6 +3,7 @@ package com.server.server.service;
 import com.server.server.domain.RefreshToken;
 import com.server.server.domain.User;
 import com.server.server.repository.RefreshTokenRepository;
+import com.server.server.repository.UserRepository;
 import com.server.server.security.JwtTokenProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +16,12 @@ import java.util.UUID;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, JwtTokenProvider jwtTokenProvider) {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -32,6 +35,12 @@ public class RefreshTokenService {
                 .build();
 
         return refreshTokenRepository.save(refreshToken);
+    }
+
+    public RefreshToken createRefreshToken(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return createRefreshToken(user);
     }
 
     public Optional<RefreshToken> findByToken(String token) {

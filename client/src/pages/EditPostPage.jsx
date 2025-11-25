@@ -11,8 +11,10 @@ export default function EditPostPage() {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  
+
   const [title, setTitle] = useState('');
+  const [summary, setSummary] = useState('');
+  const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
@@ -23,7 +25,7 @@ export default function EditPostPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const coverImageInputRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -41,7 +43,7 @@ export default function EditPostPage() {
     try {
       const response = await apiClient.get(`/api/posts/${id}`);
       const post = response.data;
-      
+
       // Check if user is the author
       if (post.authorId !== user.id) {
         alert('You are not authorized to edit this post');
@@ -50,6 +52,10 @@ export default function EditPostPage() {
       }
 
       setTitle(post.title);
+      setSummary(post.summary || '');
+      // Extract tag names from tag objects and format as hashtags
+      const tagNames = post.tags ? post.tags.map(tag => typeof tag === 'object' ? tag.name : tag) : [];
+      setTags(tagNames.map(t => `#${t}`).join(' '));
       setContent(post.content);
       setCategoryId(post.categoryId?.toString() || '');
       setCoverImageUrl(post.coverImageUrl || '');
@@ -168,8 +174,13 @@ export default function EditPostPage() {
     setError('');
 
     try {
+      // Parse hashtags: extract words starting with # and remove the # prefix
+      const parsedTags = tags.match(/#[\w\u00C0-\u024F]+/g)?.map(t => t.slice(1)) || [];
+      
       const postData = {
         title: title.trim(),
+        summary: summary.trim() || null,
+        tags: parsedTags,
         content: content.trim(),
         categoryId: categoryId ? parseInt(categoryId) : null,
         coverImageUrl: coverImageUrl.trim() || null,
@@ -177,7 +188,7 @@ export default function EditPostPage() {
       };
 
       const response = await apiClient.patch(`/api/posts/${id}`, postData);
-      
+
       if (status === 'PUBLISHED') {
         navigate(`/post/${response.data.slug}`);
       } else {
@@ -209,13 +220,12 @@ export default function EditPostPage() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <h1 className="text-3xl font-bold">Edit Story</h1>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              currentStatus === 'PUBLISHED' ? 'bg-green-100 text-green-800' :
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${currentStatus === 'PUBLISHED' ? 'bg-green-100 text-green-800' :
               currentStatus === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-              currentStatus === 'PENDING_REVIEW' ? 'bg-yellow-100 text-yellow-800' :
-              currentStatus === 'ARCHIVED' ? 'bg-red-100 text-red-800' :
-              'bg-orange-100 text-orange-800'
-            }`}>
+                currentStatus === 'PENDING_REVIEW' ? 'bg-yellow-100 text-yellow-800' :
+                  currentStatus === 'ARCHIVED' ? 'bg-red-100 text-red-800' :
+                    'bg-orange-100 text-orange-800'
+              }`}>
               {currentStatus.replace('_', ' ')}
             </span>
           </div>
@@ -241,6 +251,18 @@ export default function EditPostPage() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
               className="w-full text-4xl font-bold border-none outline-none focus:ring-0 placeholder-gray-300"
+              disabled={saving}
+            />
+          </div>
+
+          {/* Summary */}
+          <div>
+            <textarea
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="Write a short summary..."
+              className="w-full text-xl text-gray-600 border-none outline-none focus:ring-0 placeholder-gray-300 resize-none"
+              rows={2}
               disabled={saving}
             />
           </div>
@@ -309,14 +331,23 @@ export default function EditPostPage() {
 
           {/* Markdown Editor */}
           <div className="border-t pt-6">
-            <p className="text-sm text-gray-600 mb-2">
-              💡 Tip: Click the upload icon in the toolbar to insert images into your content
-            </p>
             <SimpleMDE
               value={content}
               onChange={setContent}
               options={editorOptions}
               ref={editorRef}
+            />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="#tag1 #tag2 #tag3..."
+              className="w-full text-lg text-gray-600 border-none outline-none focus:ring-0 placeholder-gray-300"
+              disabled={saving}
             />
           </div>
 

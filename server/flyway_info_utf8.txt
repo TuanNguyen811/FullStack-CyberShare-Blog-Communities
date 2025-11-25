@@ -1,0 +1,37 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.server:server >--------------------------
+[INFO] Building server 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- flyway:11.7.2:info (default-cli) @ server ---
+[INFO] Database: jdbc:mysql://localhost:3306/cybershare?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true (MySQL 9.2)
+[WARNING] Flyway upgrade recommended: MySQL 9.2 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+[INFO] Schema version: 14
+[INFO] 
+[INFO] +-----------+---------+---------------------------------------+------+---------------------+---------+----------+
+| Category  | Version | Description                           | Type | Installed On        | State   | Undoable |
++-----------+---------+---------------------------------------+------+---------------------+---------+----------+
+| Versioned | 1       | create initial schema                 | SQL  | 2025-11-11 21:56:11 | Success | No       |
+| Versioned | 2       | create posts schema                   | SQL  | 2025-11-13 06:11:45 | Success | No       |
+| Versioned | 3       | add about column to users             | SQL  | 2025-11-23 06:53:24 | Success | No       |
+| Versioned | 4       | convert post status to public private | SQL  | 2025-11-23 06:53:24 | Success | No       |
+| Versioned | 5       | alter status enum                     | SQL  | 2025-11-23 07:16:56 | Success | No       |
+| Versioned | 6       | restore original post status enum     | SQL  | 2025-11-23 07:16:56 | Success | No       |
+| Versioned | 8       | tags comments interactions            | SQL  | 2025-11-24 04:35:52 | Success | No       |
+| Versioned | 9       | add summary to posts                  | SQL  | 2025-11-24 06:51:15 | Success | No       |
+| Versioned | 10      | fix schema tags and views             | SQL  | 2025-11-25 00:05:29 | Success | No       |
+| Versioned | 11      | add description to tags               | SQL  | 2025-11-25 00:10:19 | Success | No       |
+| Versioned | 12      | fulltext search                       | SQL  | 2025-11-25 00:19:44 | Success | No       |
+| Versioned | 13      | follows notifications                 | SQL  | 2025-11-25 00:43:59 | Success | No       |
+| Versioned | 14      | fix schema mismatches                 | SQL  | 2025-11-26 00:14:28 | Failed  | No       |
+| Versioned | 15      | fix schema final                      | SQL  |                     | Pending | No       |
++-----------+---------+---------------------------------------+------+---------------------+---------+----------+
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.524 s
+[INFO] Finished at: 2025-11-25T17:27:00+07:00
+[INFO] ------------------------------------------------------------------------

@@ -104,3 +104,4 @@ uploads/
 *.swp
 *.swo
 *~
+server/src/main/resources/application-dev.properties
