@@ -128,3 +128,4 @@ server/fix_*.sql
 *.swo
 *~
 server/src/main/resources/application-dev.properties
+*.properties
