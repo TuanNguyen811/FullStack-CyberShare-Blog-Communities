@@ -10,4 +10,7 @@ public class UpdateCategoryRequest {
 
     @Size(max = 200, message = "Description must not exceed 200 characters")
     private String description;
+    
+    @Size(max = 500, message = "Cover image URL must not exceed 500 characters")
+    private String coverImageUrl;
 }

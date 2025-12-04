@@ -4,7 +4,6 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import ScrollToTop from '@/components/ScrollToTop';
 import Layout from './components/Layout';
-import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import OAuth2RedirectPage from './pages/OAuth2RedirectPage';
@@ -24,11 +23,20 @@ import TagPage from './pages/TagPage';
 import CategoryPage from './pages/CategoryPage';
 import TrendingPage from './pages/TrendingPage';
 import FeedPage from './pages/FeedPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Admin pages
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminPosts from './pages/admin/AdminPosts';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminPostsPage from './pages/admin/AdminPostsPage';
+import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
+import AdminTagsPage from './pages/admin/AdminTagsPage';
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
+import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import AdminLoginPage from './pages/admin/AdminLoginPage';
 
 function App() {
   return (
@@ -42,6 +50,8 @@ function App() {
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
               <Route path="oauth2/redirect" element={<OAuth2RedirectPage />} />
+              <Route path="forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="reset-password" element={<ResetPasswordPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="explore" element={<ExplorePage />} />
 
@@ -52,11 +62,7 @@ function App() {
               <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="bookmarks" element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />
               <Route path="notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
-
-              {/* Admin routes */}
-              <Route path="admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
-              <Route path="admin/posts" element={<ProtectedRoute><AdminPosts /></ProtectedRoute>} />
+              <Route path="change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
 
               {/* Public post and author pages */}
               <Route path="post/:slug" element={<PostDetailPage />} />
@@ -67,6 +73,18 @@ function App() {
               <Route path="feed" element={<ProtectedRoute><FeedPage /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFoundPage />} />
+            </Route>
+
+            {/* Admin Routes - Separate Layout */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route path="posts" element={<AdminPostsPage />} />
+              <Route path="categories" element={<AdminCategoriesPage />} />
+              <Route path="tags" element={<AdminTagsPage />} />
+              <Route path="analytics" element={<AdminAnalyticsPage />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
           </Routes>
         </SidebarProvider>

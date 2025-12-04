@@ -7,12 +7,14 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
-import { Calendar, Eye, Edit, Trash2, ArrowLeft, Heart, Bookmark, MessageSquare, ChevronRight } from 'lucide-react';
+import { Calendar, Eye, Edit, Trash2, ArrowLeft, Heart, Bookmark, MessageSquare, ChevronRight, Folder } from 'lucide-react';
 import { format } from 'date-fns';
 import { useInteractions } from '@/hooks/useInteractions';
 import CommentsSection from '@/components/CommentsSection';
 import FollowButton from '@/components/FollowButton';
 import SimilarPosts from '@/components/SimilarPosts';
+import TrendingPostCard from '@/components/TrendingPostCard';
+import AIChatbot from '@/components/AIChatbot';
 
 export default function PostDetailPage() {
   const { slug } = useParams();
@@ -23,6 +25,7 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [categoryPosts, setCategoryPosts] = useState([]);
 
   const {
     liked,
@@ -46,8 +49,30 @@ export default function PostDetailPage() {
       apiClient.post(`/api/posts/${post.id}/view`).catch(err => {
         console.error('Failed to increment view count:', err);
       });
+
+      // Fetch posts from same category
+      if (post.categoryId) {
+        fetchCategoryPosts();
+      }
     }
   }, [post?.id]);
+
+  const fetchCategoryPosts = async () => {
+    try {
+      const response = await apiClient.get('/api/posts', {
+        params: {
+          categoryId: post.categoryId,
+          size: 5,
+          sort: 'publishedAt,desc'
+        }
+      });
+      // Filter out current post
+      const filtered = (response.data.content || []).filter(p => p.id !== post.id);
+      setCategoryPosts(filtered.slice(0, 4));
+    } catch (err) {
+      console.error('Failed to fetch category posts:', err);
+    }
+  };
 
   const fetchPost = async () => {
     try {
@@ -121,7 +146,7 @@ export default function PostDetailPage() {
             {post.categoryName && (
               <>
                 <Link
-                  to={`/?category=${post.categoryId}`}
+                  to={`/category/${post.categorySlug || post.categoryName.toLowerCase()}`}
                   className="hover:text-gray-900 transition-colors"
                 >
                   {post.categoryName}
@@ -147,7 +172,7 @@ export default function PostDetailPage() {
             )}
 
             {/* Author & Follow */}
-            <div className="flex items-center justify-between mb-6 pb-6 border-b">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
                 <Link
                   to={`/author/${post.authorUsername}`}
@@ -186,7 +211,7 @@ export default function PostDetailPage() {
               )}
             </div>
 
-            {/* Interaction Bar */}
+            {/* Interaction Bar - Top */}
             <div className="flex items-center justify-between py-4 border-y">
               <div className="flex items-center gap-6">
                 {/* Like */}
@@ -306,6 +331,63 @@ export default function PostDetailPage() {
               ))}
             </div>
           )}
+
+          {/* Interaction Bar */}
+          <div className="flex items-center justify-between py-6 mt-8 border-t">
+            <div className="flex items-center gap-6">
+              {/* Like */}
+              <button
+                onClick={handleLike}
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                disabled={!user}
+              >
+                <Heart className={`w-7 h-7 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                <span className="text-base font-medium">{likesCount}</span>
+              </button>
+
+              {/* Comment */}
+              <button
+                onClick={() => document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <MessageSquare className="w-7 h-7" />
+                <span className="text-base font-medium">{commentsCount}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Bookmark */}
+              <button
+                onClick={handleBookmark}
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                disabled={!user}
+                title={bookmarked ? 'Remove bookmark' : 'Bookmark this post'}
+              >
+                <Bookmark className={`w-7 h-7 ${bookmarked ? 'fill-current' : ''}`} />
+              </button>
+
+              {/* Edit (for author) */}
+              {isAuthor && (
+                <>
+                  <button
+                    onClick={() => navigate(`/edit/${post.id}`)}
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                    title="Edit post"
+                  >
+                    <Edit className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="text-gray-600 hover:text-red-600 transition-colors"
+                    title="Delete post"
+                  >
+                    <Trash2 className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </article>
 
         {/* Similar Posts */}
@@ -322,7 +404,33 @@ export default function PostDetailPage() {
             }}
           />
         </div>
+
+        {/* Category Recommendations */}
+        {categoryPosts.length > 0 && (
+          <div className="mt-16 pt-8 border-t">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <Folder className="h-6 w-6 text-purple-500" />
+                More in {post.categoryName}
+              </h2>
+              <Link 
+                to={`/category/${post.categorySlug || post.categoryName?.toLowerCase()}`}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                View all →
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {categoryPosts.map((p) => (
+                <TrendingPostCard key={p.id} post={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* AI Chatbot */}
+      <AIChatbot post={post} />
     </div>
   );
 }

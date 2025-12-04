@@ -58,6 +58,7 @@ public class CategoryService {
         category.setName(request.getName());
         category.setDescription(request.getDescription());
         category.setSlug(generateSlug(request.getName()));
+        category.setCoverImageUrl(request.getCoverImageUrl());
 
         category = categoryRepository.save(category);
         return mapToDto(category);
@@ -79,6 +80,10 @@ public class CategoryService {
         if (request.getDescription() != null) {
             category.setDescription(request.getDescription());
         }
+        
+        if (request.getCoverImageUrl() != null) {
+            category.setCoverImageUrl(request.getCoverImageUrl());
+        }
 
         category = categoryRepository.save(category);
         return mapToDto(category);
@@ -98,6 +103,7 @@ public class CategoryService {
         dto.setName(category.getName());
         dto.setSlug(category.getSlug());
         dto.setDescription(category.getDescription());
+        dto.setCoverImageUrl(category.getCoverImageUrl());
         return dto;
     }
 
@@ -107,6 +113,7 @@ public class CategoryService {
         dto.setName(category.getName());
         dto.setSlug(category.getSlug());
         dto.setDescription(category.getDescription());
+        dto.setCoverImageUrl(category.getCoverImageUrl());
         dto.setPostCount(postCount);
         return dto;
     }

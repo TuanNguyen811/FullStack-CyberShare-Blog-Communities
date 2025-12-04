@@ -115,8 +115,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-50">
       {/* Categories Bar */}
       <div className="border-b border-gray-200 bg-white sticky top-[57px] z-10">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide pb-1">
             <Link
               to="/"
               className="px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-900 text-white"
@@ -138,10 +138,10 @@ export default function HomePage() {
 
       {/* Trending Section */}
       <section className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-2 mb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <TrendingUp className="h-5 w-5 text-orange-500" />
-            <h2 className="text-2xl font-bold text-gray-900">Trending</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Trending</h2>
             <Link to="/trending" className="ml-auto text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
               View all <ArrowRight className="h-4 w-4" />
             </Link>
@@ -166,10 +166,10 @@ export default function HomePage() {
       {/* Feed from followed authors */}
       {isAuthenticated && feedPosts.length > 0 && (
         <section className="bg-gray-50 border-b">
-          <div className="max-w-7xl mx-auto px-6 py-8">
-            <div className="flex items-center gap-2 mb-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+            <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <Users className="h-5 w-5 text-blue-500" />
-              <h2 className="text-2xl font-bold text-gray-900">From People You Follow</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">From People You Follow</h2>
               <Link to="/feed" className="ml-auto text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
                 View all <ArrowRight className="h-4 w-4" />
               </Link>
@@ -185,8 +185,8 @@ export default function HomePage() {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Left: Posts List */}
           <div className="lg:col-span-2">
             {/* Tab Menu */}
@@ -276,8 +276,8 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Right Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          {/* Right Sidebar - Hidden on mobile */}
+          <div className="hidden lg:block lg:col-span-1 space-y-6">
             {/* Top Authors */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">

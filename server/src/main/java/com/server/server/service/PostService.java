@@ -190,6 +190,7 @@ public class PostService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own posts");
         }
 
+
         postRepository.delete(post);
     }
 
@@ -315,6 +316,12 @@ public class PostService {
     // Admin methods
     public Page<PostListDto> getPostsByStatus(PostStatus status, Pageable pageable) {
         return postRepository.findByStatus(status, pageable)
+                .map(this::mapToListDto);
+    }
+
+    public Page<PostListDto> getAllPostsForAdmin(Pageable pageable) {
+        // Exclude DRAFT posts - they are private to authors
+        return postRepository.findByStatusNot(PostStatus.DRAFT, pageable)
                 .map(this::mapToListDto);
     }
 

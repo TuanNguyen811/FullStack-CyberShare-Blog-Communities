@@ -98,6 +98,29 @@ Thumbs.db
 server/uploads/
 uploads/
 
+# ============================================
+# Security - QUAN TRỌNG
+# ============================================
+# Application secrets (nếu có)
+**/application-prod.properties
+**/application-local.properties
+**/*-secret*.properties
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+
+# Package lock files (optional - có thể giữ để đồng bộ versions)
+# package-lock.json
+# pnpm-lock.yaml
+
+# Flyway temp files
+server/flyway_info*.txt
+server/fix_*.sql
+
 # Temporary files
 *.tmp
 *.temp

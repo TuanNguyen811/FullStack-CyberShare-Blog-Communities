@@ -73,6 +73,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         // Also allow direct /auth/** for backwards compatibility
                         .requestMatchers("/auth/**").permitAll()
+                        // Public endpoints - Password reset (forgot/reset don't need auth)
+                        .requestMatchers("/api/password/forgot", "/api/password/reset", "/api/password/reset/validate").permitAll()
                         // OAuth2 endpoints
                         .requestMatchers("/oauth2/**").permitAll()
                         // Public endpoints - Uploaded files

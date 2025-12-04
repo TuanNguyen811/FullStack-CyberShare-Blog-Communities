@@ -5,10 +5,18 @@ import com.server.server.domain.User;
 import com.server.server.domain.UserRole;
 import com.server.server.domain.UserStatus;
 import com.server.server.dto.UserDTO;
+import com.server.server.dto.TagDto;
+import com.server.server.dto.CreateTagRequest;
+import com.server.server.dto.UpdateTagRequest;
+import com.server.server.dto.category.CategoryDto;
+import com.server.server.dto.category.CreateCategoryRequest;
+import com.server.server.dto.category.UpdateCategoryRequest;
 import com.server.server.repository.PostRepository;
 import com.server.server.repository.UserRepository;
 import com.server.server.service.PostService;
 import com.server.server.service.UserService;
+import com.server.server.service.CategoryService;
+import com.server.server.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +41,8 @@ public class AdminController {
     private final PostRepository postRepository;
     private final UserService userService;
     private final PostService postService;
+    private final CategoryService categoryService;
+    private final TagService tagService;
 
     // ==================== STATISTICS ====================
     @GetMapping("/statistics")
@@ -43,11 +54,14 @@ public class AdminController {
         stats.put("activeUsers", userRepository.countByStatus(UserStatus.ACTIVE));
         stats.put("bannedUsers", userRepository.countByStatus(UserStatus.BANNED));
         
-        // Post statistics
-        stats.put("totalPosts", postRepository.count());
-        stats.put("publishedPosts", postRepository.countByStatus(PostStatus.PUBLISHED));
-        stats.put("pendingPosts", postRepository.countByStatus(PostStatus.PENDING_REVIEW));
-        stats.put("draftPosts", postRepository.countByStatus(PostStatus.DRAFT));
+        // Post statistics (exclude DRAFT - private to authors)
+        long publishedPosts = postRepository.countByStatus(PostStatus.PUBLISHED);
+        long pendingPosts = postRepository.countByStatus(PostStatus.PENDING_REVIEW);
+        long hiddenPosts = postRepository.countByStatus(PostStatus.HIDDEN);
+        stats.put("totalPosts", publishedPosts + pendingPosts + hiddenPosts);
+        stats.put("publishedPosts", publishedPosts);
+        stats.put("pendingPosts", pendingPosts);
+        stats.put("hiddenPosts", hiddenPosts);
         
         // Time-based statistics (last 7 days)
         LocalDateTime weekAgo = LocalDateTime.now().minusDays(7);
@@ -120,6 +134,17 @@ public class AdminController {
     }
 
     // ==================== POST MODERATION ====================
+    @GetMapping("/posts")
+    public ResponseEntity<?> getAllPosts(
+            @RequestParam(required = false) PostStatus status,
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 15, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        if (status != null) {
+            return ResponseEntity.ok(postService.getPostsByStatus(status, pageable));
+        }
+        return ResponseEntity.ok(postService.getAllPostsForAdmin(pageable));
+    }
+
     @GetMapping("/posts/pending")
     public ResponseEntity<?> getPendingPosts(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -153,6 +178,44 @@ public class AdminController {
     public ResponseEntity<?> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         return ResponseEntity.ok(Map.of("message", "Post deleted successfully"));
+    }
+
+    // ==================== CATEGORY MANAGEMENT ====================
+    @PostMapping("/categories")
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
+        return ResponseEntity.ok(categoryService.createCategory(request));
+    }
+
+    @PutMapping("/categories/{id}")
+    public ResponseEntity<CategoryDto> updateCategory(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateCategoryRequest request) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, request));
+    }
+
+    @DeleteMapping("/categories/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ==================== TAG MANAGEMENT ====================
+    @PostMapping("/tags")
+    public ResponseEntity<TagDto> createTag(@Valid @RequestBody CreateTagRequest request) {
+        return ResponseEntity.ok(tagService.createTag(request));
+    }
+
+    @PutMapping("/tags/{id}")
+    public ResponseEntity<TagDto> updateTag(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateTagRequest request) {
+        return ResponseEntity.ok(tagService.updateTag(id, request));
+    }
+
+    @DeleteMapping("/tags/{id}")
+    public ResponseEntity<Void> deleteTag(@PathVariable Long id) {
+        tagService.deleteTag(id);
+        return ResponseEntity.noContent().build();
     }
 
     private UserDTO convertToDTO(User user) {

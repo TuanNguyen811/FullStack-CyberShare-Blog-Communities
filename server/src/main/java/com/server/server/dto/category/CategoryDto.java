@@ -8,5 +8,6 @@ public class CategoryDto {
     private String name;
     private String slug;
     private String description;
+    private String coverImageUrl;
     private Long postCount;
 }

@@ -4,7 +4,7 @@ import apiClient from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSidebar } from '@/context/SidebarContext';
-import { Bell, PenSquare, LogOut, Menu, X, Search, Home, Compass, Info, BookOpen, BarChart3, Settings, MessageCircle, Shield } from 'lucide-react';
+import { Bell, PenSquare, LogOut, Menu, X, Search, Home, Compass, Info, BookOpen, Bookmark, Users, FileText, BarChart3, Settings, MessageCircle, Shield, ChevronLeft } from 'lucide-react';
 
 export default function Header() {
   const { user, isAuthenticated, logout, loading } = useAuth();
@@ -13,6 +13,14 @@ export default function Header() {
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Close sidebar on mobile when route changes
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -63,12 +71,36 @@ export default function Header() {
 
   return (
     <>
-      {/* Sidebar Overlay */}
+      {/* Sidebar Overlay - Only on mobile */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
+      )}
+
+      {/* Mobile Search Overlay */}
+      {mobileSearchOpen && (
+        <div className="fixed inset-0 bg-white z-50 md:hidden">
+          <div className="flex items-center gap-2 p-3 border-b">
+            <button
+              onClick={() => setMobileSearchOpen(false)}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <form onSubmit={(e) => { handleSearch(e); setMobileSearchOpen(false); }} className="flex-1">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                autoFocus
+                className="w-full px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500 bg-gray-50"
+              />
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Header */}
@@ -118,7 +150,16 @@ export default function Header() {
             </div>
 
             {/* Right Section: Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Mobile Search Button */}
+              <button
+                onClick={() => setMobileSearchOpen(true)}
+                className="p-2 hover:bg-gray-100 rounded-full md:hidden"
+                aria-label="Search"
+              >
+                <Search className="h-5 w-5 text-gray-600" />
+              </button>
+
               {isAuthenticated ? (
                 <>
                   {/* Write Button */}
@@ -239,16 +280,60 @@ export default function Header() {
             <span>Home</span>
           </Link>
 
+          <Link 
+            to="/explore"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
+              location.pathname === '/explore' ? 'bg-gray-100 font-medium' : 'text-gray-700'
+            }`}
+          >
+            <Compass className="h-5 w-5" />
+            <span>Explore</span>
+          </Link>
+
+          <Link 
+            to="/trending"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
+              location.pathname === '/trending' ? 'bg-gray-100 font-medium' : 'text-gray-700'
+            }`}
+          >
+            <BarChart3 className="h-5 w-5" />
+            <span>Trending</span>
+          </Link>
+
           {isAuthenticated && (
             <>
+              <div className="pt-4 border-t mt-4">
+                <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Personal</p>
+              </div>
+
+              <Link 
+                to="/feed"
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
+                  location.pathname === '/feed' ? 'bg-gray-100 font-medium' : 'text-gray-700'
+                }`}
+              >
+                <Users className="h-5 w-5" />
+                <span>Following</span>
+              </Link>
+
               <Link 
                 to="/bookmarks"
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
                   location.pathname === '/bookmarks' ? 'bg-gray-100 font-medium' : 'text-gray-700'
                 }`}
               >
-                <BookOpen className="h-5 w-5" />
-                <span>Library</span>
+                <Bookmark className="h-5 w-5" />
+                <span>Bookmarks</span>
+              </Link>
+
+              <Link 
+                to="/dashboard"
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
+                  location.pathname === '/dashboard' ? 'bg-gray-100 font-medium' : 'text-gray-700'
+                }`}
+              >
+                <FileText className="h-5 w-5" />
+                <span>My Posts</span>
               </Link>
 
               <Link 
@@ -264,48 +349,43 @@ export default function Header() {
               </Link>
 
               <Link 
-                to="/dashboard"
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
-                  location.pathname === '/dashboard' ? 'bg-gray-100 font-medium' : 'text-gray-700'
-                }`}
-              >
-                <BarChart3 className="h-5 w-5" />
-                <span>Stories</span>
-              </Link>
-
-              <Link 
                 to="/settings"
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
                   location.pathname === '/settings' ? 'bg-gray-100 font-medium' : 'text-gray-700'
                 }`}
               >
-                <BarChart3 className="h-5 w-5" />
-                <span>Stats</span>
+                <Settings className="h-5 w-5" />
+                <span>Settings</span>
               </Link>
 
               {user?.role === 'ADMIN' && (
-                <Link 
-                  to="/admin"
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
-                    location.pathname.startsWith('/admin') ? 'bg-purple-100 font-medium text-purple-700' : 'text-purple-600'
-                  }`}
-                >
-                  <Shield className="h-5 w-5" />
-                  <span>Admin</span>
-                </Link>
+                <>
+                  <div className="pt-4 border-t mt-4">
+                    <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Admin</p>
+                  </div>
+                  <Link 
+                    to="/admin"
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
+                      location.pathname.startsWith('/admin') ? 'bg-purple-100 font-medium text-purple-700' : 'text-purple-600'
+                    }`}
+                  >
+                    <Shield className="h-5 w-5" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                </>
               )}
             </>
           )}
 
           <div className="pt-4 border-t mt-4">
             <Link 
-              to="/explore"
+              to="/about"
               className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
-                location.pathname === '/explore' ? 'bg-gray-100 font-medium' : 'text-gray-700'
+                location.pathname === '/about' ? 'bg-gray-100 font-medium' : 'text-gray-700'
               }`}
             >
-              <Compass className="h-5 w-5" />
-              <span>Explore topics</span>
+              <Info className="h-5 w-5" />
+              <span>About</span>
             </Link>
           </div>
         </nav>

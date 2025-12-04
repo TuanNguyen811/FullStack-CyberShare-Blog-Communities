@@ -114,8 +114,15 @@ export default function CategoryPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Category Hero/Cover */}
-      <div className={`bg-gradient-to-r ${getCoverGradient(category?.name)} relative`}>
-        <div className="absolute inset-0 bg-black/30" />
+      <div 
+        className={`relative ${!category?.coverImageUrl ? `bg-gradient-to-r ${getCoverGradient(category?.name)}` : ''}`}
+        style={category?.coverImageUrl ? {
+          backgroundImage: `url(${category.coverImageUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        } : {}}
+      >
+        <div className={`absolute inset-0 ${category?.coverImageUrl ? 'bg-black/50' : 'bg-black/30'}`} />
         <div className="max-w-7xl mx-auto px-6 py-16 relative">
           <Link 
             to="/" 

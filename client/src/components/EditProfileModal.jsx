@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import apiClient from '@/lib/api';
-import { X, Save } from 'lucide-react';
+import { X, Save, Key } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function EditProfileModal({ user, onClose }) {
@@ -238,6 +239,16 @@ export default function EditProfileModal({ user, onClose }) {
                 <p className="text-sm text-gray-900">{user.email}</p>
               </div>
             </div>
+          </div>
+
+          {/* Change Password Link */}
+          <div className="border-t pt-6">
+            <Link to="/change-password" onClick={onClose}>
+              <Button type="button" variant="outline" className="w-full gap-2">
+                <Key className="h-4 w-4" />
+                Change Password
+              </Button>
+            </Link>
           </div>
 
           {/* Actions */}
