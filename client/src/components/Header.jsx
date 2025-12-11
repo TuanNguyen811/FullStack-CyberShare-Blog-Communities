@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSidebar } from '@/context/SidebarContext';
+import { useSidebar } from '@/contexts/SidebarContext';
 import { Bell, PenSquare, LogOut, Menu, X, Search, Home, Compass, Info, BookOpen, Bookmark, Users, FileText, BarChart3, Settings, MessageCircle, Shield, ChevronLeft } from 'lucide-react';
 
 export default function Header() {

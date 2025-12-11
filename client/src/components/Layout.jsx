@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-import { useSidebar } from '../context/SidebarContext';
+import { useSidebar } from '../contexts/SidebarContext';
 
 export default function Layout() {
   const { sidebarOpen } = useSidebar();

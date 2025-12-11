@@ -410,7 +410,6 @@ export default function PostDetailPage() {
           <div className="mt-16 pt-8 border-t">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <Folder className="h-6 w-6 text-purple-500" />
                 More in {post.categoryName}
               </h2>
               <Link 

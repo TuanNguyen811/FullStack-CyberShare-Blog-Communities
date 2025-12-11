@@ -385,24 +385,6 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-
-            {/* Footer Info */}
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-100">
-              <h3 className="font-bold text-gray-900 mb-2">Welcome to CyberShare</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                A community for developers to share knowledge, ideas, and connect with fellow tech enthusiasts.
-              </p>
-              <div className="text-xs text-gray-500 space-y-1">
-                <p>📝 Write and share your stories</p>
-                <p>💡 Discover inspiring content</p>
-                <p>🤝 Connect with amazing people</p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-blue-200">
-                <p className="text-xs text-gray-400">
-                  © 2025 CyberShare. All rights reserved.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

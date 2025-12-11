@@ -137,7 +137,7 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size) {
 
         if (since == null) {
-            since = LocalDateTime.now().minusDays(7); // Default to last 7 days
+            since = LocalDateTime.now().minusDays(30); // Default to last 7 days
         }
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(postService.getTrendingPosts(since, pageable));
