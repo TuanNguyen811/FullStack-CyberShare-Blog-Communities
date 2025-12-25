@@ -232,7 +232,7 @@ export default function ExplorePage() {
                               <img
                                 src={post.coverImageUrl}
                                 alt={post.title}
-                                className="w-full h-full object-cover rounded"
+                                className="w-full h-full object-cover rounded-sm"
                               />
                             </div>
                           )}

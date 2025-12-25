@@ -91,7 +91,7 @@ export default function BookmarksPage() {
                 <Button
                   variant="outline"
                   disabled={page === 0}
-                  onClick={() => setPage(page - 1)}
+                  onClick={() => { setPage(page - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
                   Previous
                 </Button>
@@ -101,7 +101,7 @@ export default function BookmarksPage() {
                 <Button
                   variant="outline"
                   disabled={page >= totalPages - 1}
-                  onClick={() => setPage(page + 1)}
+                  onClick={() => { setPage(page + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
                   Next
                 </Button>

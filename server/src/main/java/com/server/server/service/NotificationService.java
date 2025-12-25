@@ -51,6 +51,26 @@ public class NotificationService {
                 dto);
     }
 
+    @Transactional
+    public void createSystemNotification(Long recipientId, NotificationType type, String message) {
+        User recipient = userRepository.findById(recipientId).orElseThrow();
+
+        Notification notification = new Notification();
+        notification.setRecipient(recipient);
+        notification.setActor(null); // System notification - no actor
+        notification.setType(type);
+        notification.setMessage(message);
+
+        Notification savedNotification = notificationRepository.save(notification);
+
+        // Send realtime notification
+        NotificationDto dto = mapToDto(savedNotification);
+        messagingTemplate.convertAndSendToUser(
+                recipient.getUsername(),
+                "/queue/notifications",
+                dto);
+    }
+
     public Page<NotificationDto> getUserNotifications(Long userId, Pageable pageable) {
         return notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId, pageable)
                 .map(this::mapToDto);
@@ -83,6 +103,7 @@ public class NotificationService {
         dto.setId(notification.getId());
         dto.setType(notification.getType().name());
         dto.setEntityId(notification.getEntityId());
+        dto.setMessage(notification.getMessage());
         dto.setRead(notification.isRead());
         dto.setCreatedAt(notification.getCreatedAt());
 

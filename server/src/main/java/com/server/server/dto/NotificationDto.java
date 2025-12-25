@@ -8,6 +8,7 @@ public class NotificationDto {
     private Long id;
     private String type;
     private Long entityId;
+    private String message;
     private boolean isRead;
     private LocalDateTime createdAt;
     private Long actorId;

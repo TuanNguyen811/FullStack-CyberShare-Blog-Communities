@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '@/lib/api';
 import { format } from 'date-fns';
-import { Heart, MessageSquare, UserPlus } from 'lucide-react';
+import { Heart, MessageSquare, UserPlus, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function NotificationsPage() {
@@ -58,6 +58,8 @@ export default function NotificationsPage() {
                 return <MessageSquare className="h-5 w-5 text-blue-500 fill-current" />;
             case 'FOLLOW':
                 return <UserPlus className="h-5 w-5 text-green-500" />;
+            case 'ROLE_CHANGE':
+                return <Shield className="h-5 w-5 text-purple-500" />;
             default:
                 return <div className="h-5 w-5 bg-gray-200 rounded-full" />;
         }
@@ -84,6 +86,12 @@ export default function NotificationsPage() {
                         <span className="font-semibold text-gray-900">{actorName}</span> started following you.
                     </span>
                 );
+            case 'ROLE_CHANGE':
+                return (
+                    <span className="text-gray-900">
+                        {notification.message || 'Your account role has been updated.'}
+                    </span>
+                );
             default:
                 return 'New notification';
         }
@@ -92,6 +100,9 @@ export default function NotificationsPage() {
     const getLink = (notification) => {
         if (notification.type === 'FOLLOW') {
             return `/author/${notification.actorUsername}`;
+        }
+        if (notification.type === 'ROLE_CHANGE') {
+            return '/dashboard'; // Redirect to dashboard for role change
         }
         return `/post/${notification.entityId}`;
     };

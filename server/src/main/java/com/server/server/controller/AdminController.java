@@ -17,6 +17,8 @@ import com.server.server.service.PostService;
 import com.server.server.service.UserService;
 import com.server.server.service.CategoryService;
 import com.server.server.service.TagService;
+import com.server.server.service.NotificationService;
+import com.server.server.domain.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +45,7 @@ public class AdminController {
     private final PostService postService;
     private final CategoryService categoryService;
     private final TagService tagService;
+    private final NotificationService notificationService;
 
     // ==================== STATISTICS ====================
     @GetMapping("/statistics")
@@ -127,10 +130,30 @@ public class AdminController {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        user.setRole(UserRole.valueOf(role));
+        UserRole oldRole = user.getRole();
+        UserRole newRole = UserRole.valueOf(role);
+        
+        user.setRole(newRole);
         User savedUser = userRepository.save(user);
         
+        // Send notification to user about role change
+        if (oldRole != newRole) {
+            String message = getRoleChangeMessage(oldRole, newRole);
+            notificationService.createSystemNotification(userId, NotificationType.ROLE_CHANGE, message);
+        }
+        
         return ResponseEntity.ok(convertToDTO(savedUser));
+    }
+    
+    private String getRoleChangeMessage(UserRole oldRole, UserRole newRole) {
+        if (newRole == UserRole.AUTHOR) {
+            return "🎉 Chúc mừng! Bạn đã được cấp quyền AUTHOR. Bây giờ bạn có thể đăng bài viết trên CyberShare.";
+        } else if (newRole == UserRole.ADMIN) {
+            return "🛡️ Bạn đã được cấp quyền ADMIN. Bạn có toàn quyền quản lý hệ thống CyberShare.";
+        } else if (newRole == UserRole.USER) {
+            return "ℹ️ Quyền của bạn đã được thay đổi thành USER.";
+        }
+        return "ℹ️ Quyền của bạn đã được cập nhật thành " + newRole.name() + ".";
     }
 
     // ==================== POST MODERATION ====================

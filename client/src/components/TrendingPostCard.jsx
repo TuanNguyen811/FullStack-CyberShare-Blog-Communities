@@ -6,7 +6,7 @@ export default function TrendingPostCard({ post }) {
         <article className="group">
             <Link to={`/post/${post.slug}`}>
                 {/* Image - aspect-video như FeaturedCard */}
-                <div className="relative w-full aspect-video bg-gray-200 rounded-lg overflow-hidden mb-3">
+                <div className="relative w-full aspect-video bg-gray-200 rounded-sm overflow-hidden mb-3">
                     {post.coverImageUrl ? (
                         <img
                             src={post.coverImageUrl}
@@ -20,24 +20,17 @@ export default function TrendingPostCard({ post }) {
                             </span>
                         </div>
                     )}
-                    
-                    {/* Category badge */}
-                    {post.categoryName && (
-                        <span className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 text-gray-800 rounded text-xs font-medium">
-                            {post.categoryName}
-                        </span>
-                    )}
                 </div>
 
                 {/* Content */}
                 <div className="space-y-2">
                     {/* Title */}
-                    <h3 className="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                    <h3 className="font-bold text-base text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
                         {post.title}
                     </h3>
 
                     {/* Author & Stats */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
                         {post.authorAvatarUrl ? (
                             <img
                                 src={post.authorAvatarUrl}

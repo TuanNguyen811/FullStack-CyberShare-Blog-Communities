@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api';
-import PostCard from '@/components/PostCard';
+import PostItemLong from '@/components/PostItemLong';
 import { Button } from '@/components/ui/button';
 import { Users, ArrowLeft } from 'lucide-react';
 
@@ -90,9 +90,9 @@ export default function FeedPage() {
           </div>
         ) : (
           <>
-            <div className="space-y-4">
+            <div className="space-y-8">
               {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
+                <PostItemLong key={post.id} post={post} />
               ))}
             </div>
 
@@ -101,7 +101,7 @@ export default function FeedPage() {
               <div className="flex justify-center gap-2 mt-8 pt-8 border-t">
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page === 0}
                 >
                   Previous
@@ -111,7 +111,7 @@ export default function FeedPage() {
                 </span>
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page >= totalPages - 1}
                 >
                   Next

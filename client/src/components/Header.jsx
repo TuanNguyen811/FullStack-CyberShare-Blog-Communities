@@ -7,7 +7,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 import { Bell, PenSquare, LogOut, Menu, X, Search, Home, Compass, Info, BookOpen, Bookmark, Users, FileText, BarChart3, Settings, MessageCircle, Shield, ChevronLeft } from 'lucide-react';
 
 export default function Header() {
-  const { user, isAuthenticated, logout, loading } = useAuth();
+  const { user, isAuthenticated, logout, loading, canWrite } = useAuth();
   const { sidebarOpen, setSidebarOpen } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,8 +59,10 @@ export default function Header() {
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold text-primary">CyberShare</h1>
+            <Link to="/" className="flex items-center">
+              <span className="text-2xl font-bold text-primary" style={{ fontFamily: 'Times New Roman, Times, serif' }}>
+                CyberShare
+              </span>
             </Link>
             <div className="h-8 w-8 animate-pulse bg-gray-200 rounded-full"></div>
           </div>
@@ -118,9 +120,11 @@ export default function Header() {
                 <Menu className="h-6 w-6" />
               </button>
 
-              {/* Logo */}
+              {/* Brand */}
               <Link to="/" className="flex items-center">
-                <h1 className="text-2xl font-bold text-primary">CyberShare</h1>
+                <span className="text-2xl font-bold text-primary" style={{ fontFamily: 'Times New Roman, Times, serif' }}>
+                  CyberShare
+                </span>
               </Link>
             </div>
 
@@ -162,13 +166,15 @@ export default function Header() {
 
               {isAuthenticated ? (
                 <>
-                  {/* Write Button */}
-                  <Link to="/write">
-                    <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-gray-900">
-                      <PenSquare className="h-5 w-5" />
-                      <span className="hidden md:inline">Write</span>
-                    </Button>
-                  </Link>
+                  {/* Write Button - Only for AUTHOR and ADMIN */}
+                  {canWrite && (
+                    <Link to="/write">
+                      <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-gray-900">
+                        <PenSquare className="h-5 w-5" />
+                        <span className="hidden md:inline">Write</span>
+                      </Button>
+                    </Link>
+                  )}
 
                   {/* Notifications */}
                   <Link to="/notifications">

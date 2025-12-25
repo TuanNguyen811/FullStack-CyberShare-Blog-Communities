@@ -81,3 +81,36 @@
     display: none;
   }
 }
+
+@layer components {
+  /* Markdown (Tailwind Typography) */
+  .prose :not(pre) > code {
+    @apply text-red-600 bg-gray-100 px-1.5 py-0.5 rounded text-sm;
+  }
+
+  .prose :not(pre) > code::before,
+  .prose :not(pre) > code::after {
+    content: '';
+  }
+
+  /* Ensure fenced code blocks don't inherit inline-code styling */
+  .prose pre code,
+  .prose pre code * {
+    color: inherit;
+    background: transparent;
+    padding: 0;
+    border: 0;
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+  }
+
+  .EasyMDEContainer .editor-preview pre,
+  .EasyMDEContainer .editor-preview-side pre {
+    @apply bg-slate-900 text-slate-100 border border-slate-700/60 rounded-md p-4 overflow-x-auto;
+  }
+
+  .EasyMDEContainer .editor-preview pre code,
+  .EasyMDEContainer .editor-preview-side pre code {
+    @apply bg-transparent p-0;
+  }
+}

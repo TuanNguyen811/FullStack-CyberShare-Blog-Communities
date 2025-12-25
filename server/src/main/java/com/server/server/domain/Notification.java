@@ -33,6 +33,9 @@ public class Notification {
     @Column(name = "entity_id")
     private Long entityId;
 
+    @Column(columnDefinition = "TEXT")
+    private String message;
+
     @Column(name = "is_read")
     private boolean isRead = false;
 

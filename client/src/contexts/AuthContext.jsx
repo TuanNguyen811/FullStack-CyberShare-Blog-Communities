@@ -89,6 +89,9 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  // Check if user can write posts (AUTHOR or ADMIN only)
+  const canWrite = user?.role === 'AUTHOR' || user?.role === 'ADMIN';
+
   const value = {
     user,
     login,
@@ -97,6 +100,7 @@ export const AuthProvider = ({ children }) => {
     updateUser,
     setTokensFromOAuth,
     isAuthenticated: !!user,
+    canWrite,
     loading,
   };
 

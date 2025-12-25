@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -41,8 +42,9 @@ public class PostController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('AUTHOR', 'ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "Create post", description = "Create a new post (authenticated users only)")
+    @Operation(summary = "Create post", description = "Create a new post (AUTHOR or ADMIN only)")
     public ResponseEntity<PostDto> createPost(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody CreatePostRequest request) {
@@ -56,8 +58,9 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('AUTHOR', 'ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "Update post", description = "Update an existing post (author only)")
+    @Operation(summary = "Update post", description = "Update an existing post (AUTHOR or ADMIN only)")
     public ResponseEntity<PostDto> updatePost(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -72,8 +75,9 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('AUTHOR', 'ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "Delete post", description = "Delete a post (author only)")
+    @Operation(summary = "Delete post", description = "Delete a post (AUTHOR or ADMIN only)")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -137,7 +141,7 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size) {
 
         if (since == null) {
-            since = LocalDateTime.now().minusDays(30); // Default to last 7 days
+            since = LocalDateTime.now().minusDays(30); // Default to last 30 days
         }
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(postService.getTrendingPosts(since, pageable));
@@ -226,8 +230,9 @@ public class PostController {
     }
 
     @PostMapping("/upload-image")
+    @PreAuthorize("hasAnyRole('AUTHOR', 'ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "Upload post image", description = "Upload an image for post content or cover (authenticated users only)")
+    @Operation(summary = "Upload post image", description = "Upload an image for post content or cover (AUTHOR or ADMIN only)")
     public ResponseEntity<Map<String, String>> uploadPostImage(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam("file") MultipartFile file) {

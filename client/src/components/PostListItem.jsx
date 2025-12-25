@@ -65,7 +65,7 @@ export default function PostListItem({ post, index }) {
                     <img
                         src={post.coverImageUrl}
                         alt={post.title}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-16 h-16 object-cover rounded-sm"
                     />
                 </Link>
             )}

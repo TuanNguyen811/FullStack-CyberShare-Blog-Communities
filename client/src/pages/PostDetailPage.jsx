@@ -275,7 +275,7 @@ export default function PostDetailPage() {
               <img
                 src={post.coverImageUrl}
                 alt={post.title}
-                className="w-full h-auto rounded-lg"
+                className="w-full h-auto rounded-sm"
               />
             </div>
           )}
@@ -289,13 +289,12 @@ export default function PostDetailPage() {
             prose-p:text-gray-800 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-xl
             prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
             prose-strong:text-gray-900 prose-strong:font-semibold
-            prose-code:text-red-600 prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-['']
-            prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
+            prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:p-4 prose-pre:rounded-md prose-pre:border prose-pre:border-slate-700/60 prose-pre:overflow-x-auto
             prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-4
             prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-4
             prose-li:text-gray-800 prose-li:mb-2 prose-li:text-xl
             prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600
-            prose-img:rounded-lg prose-img:w-full prose-img:my-8
+            prose-img:rounded-sm prose-img:w-full prose-img:my-8
             prose-hr:border-gray-300 prose-hr:my-8
             prose-table:border-collapse prose-table:w-full
             prose-th:border prose-th:border-gray-300 prose-th:bg-gray-50 prose-th:p-2 prose-th:text-left

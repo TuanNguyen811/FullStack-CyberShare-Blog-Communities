@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 
 export default function PostCard({ post }) {
     return (
-        <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+        <article className="bg-white rounded-sm shadow-sm hover:shadow-md transition-shadow overflow-hidden">
             <Link to={`/post/${post.slug}`} className="block">
                 <div className="flex flex-col md:flex-row">
                     {/* Cover Image */}

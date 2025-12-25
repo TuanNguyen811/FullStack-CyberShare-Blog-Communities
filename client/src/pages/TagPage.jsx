@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import apiClient from '@/lib/api';
-import { format } from 'date-fns';
-import { Eye, Heart, MessageCircle, Bookmark, Tag as TagIcon } from 'lucide-react';
+import { Tag as TagIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useInteractions } from '@/hooks/useInteractions';
+import PostItemLong from '@/components/PostItemLong';
 
 export default function TagPage() {
   const { slug } = useParams();
@@ -99,7 +98,7 @@ export default function TagPage() {
           <>
             <div className="space-y-8">
               {posts.map((post) => (
-                <PostItem key={post.id} post={post} />
+                <PostItemLong key={post.id} post={post} />
               ))}
             </div>
 
@@ -108,7 +107,7 @@ export default function TagPage() {
               <div className="flex justify-center gap-2 mt-12 pt-8 border-t">
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page === 0}
                 >
                   Previous
@@ -118,7 +117,7 @@ export default function TagPage() {
                 </span>
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page >= totalPages - 1}
                 >
                   Next
@@ -129,121 +128,5 @@ export default function TagPage() {
         )}
       </div>
     </div>
-  );
-}
-
-// PostItem Component
-function PostItem({ post }) {
-  const { isAuthenticated } = useAuth();
-  const { liked, bookmarked, handleLike, handleBookmark, loading } = useInteractions(post.id);
-
-  const handleBookmarkClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isAuthenticated) {
-      alert('Please login to bookmark posts');
-      return;
-    }
-    handleBookmark();
-  };
-
-  return (
-    <article className="group border-b border-gray-200 pb-8">
-      <Link to={`/post/${post.slug}`}>
-        <div className="flex gap-6">
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            {/* Author */}
-            <div className="flex items-center gap-2 mb-3">
-              {post.authorAvatarUrl ? (
-                <img
-                  src={post.authorAvatarUrl}
-                  alt={post.authorDisplayName}
-                  className="w-6 h-6 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
-                  {post.authorDisplayName?.charAt(0) || 'U'}
-                </div>
-              )}
-              <span className="text-sm text-gray-900 font-medium">{post.authorDisplayName}</span>
-            </div>
-
-            {/* Title */}
-            <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-gray-600 transition-colors line-clamp-2">
-              {post.title}
-            </h2>
-
-            {/* Excerpt */}
-            <p className="text-gray-600 text-base mb-4 line-clamp-2">
-              {post.summary || post.content?.substring(0, 150)}...
-            </p>
-
-            {/* Meta */}
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              {post.publishedAt && (
-                <time dateTime={post.publishedAt}>
-                  {format(new Date(post.publishedAt), 'MMM dd, yyyy')}
-                </time>
-              )}
-              <div className="flex items-center gap-1">
-                <Eye className="w-4 h-4" />
-                <span>{post.views || 0}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Heart className={`w-4 h-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
-                <span>{post.likesCount || 0}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <MessageCircle className="w-4 h-4" />
-                <span>{post.commentsCount || 0}</span>
-              </div>
-              {post.categoryName && (
-                <span className="text-gray-700">{post.categoryName}</span>
-              )}
-            </div>
-
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {post.tags.map((tag) => (
-                  <Link
-                    key={tag.id}
-                    to={`/tag/${tag.slug}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 transition-colors"
-                  >
-                    #{tag.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Cover Image */}
-          {post.coverImageUrl && (
-            <div className="w-32 h-32 flex-shrink-0">
-              <img
-                src={post.coverImageUrl}
-                alt={post.title}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
-          )}
-
-          {/* Bookmark Button */}
-          <button
-            onClick={handleBookmarkClick}
-            disabled={loading}
-            className={`p-2 rounded-full transition-all disabled:opacity-50 hover:bg-gray-100 self-start ${
-              bookmarked ? 'text-gray-900' : 'text-gray-500'
-            }`}
-            title={bookmarked ? 'Remove bookmark' : 'Bookmark this post'}
-          >
-            <Bookmark className={`w-5 h-5 ${bookmarked ? 'fill-current' : ''}`} />
-          </button>
-        </div>
-      </Link>
-    </article>
   );
 }

@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api';
 import TrendingPostCard from '@/components/TrendingPostCard';
 import PostListItem from '@/components/PostListItem';
-import PostCard from '@/components/PostCard';
+import PostItemLong from '@/components/PostItemLong';
 import FollowButton from '@/components/FollowButton';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Users, Flame, Clock, Eye, Heart, ArrowRight, Tag, Folder } from 'lucide-react';
@@ -240,9 +240,9 @@ export default function HomePage() {
             </div>
 
             {/* Posts List */}
-            <div className="space-y-4">
+            <div className="space-y-8">
               {latestPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+                <PostItemLong key={post.id} post={post} />
               ))}
             </div>
 
@@ -257,7 +257,7 @@ export default function HomePage() {
               <div className="flex justify-center gap-2 mt-8">
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page === 0}
                 >
                   Previous
@@ -267,7 +267,7 @@ export default function HomePage() {
                 </span>
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page >= totalPages - 1}
                 >
                   Next

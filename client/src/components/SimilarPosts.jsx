@@ -35,7 +35,7 @@ export default function SimilarPosts({ postId }) {
             <div className="grid gap-6 md:grid-cols-3">
                 {posts.map((post) => (
                     <Link key={post.id} to={`/posts/${post.slug}`} className="group">
-                        <div className="aspect-video rounded-lg overflow-hidden bg-muted mb-3">
+                        <div className="aspect-video rounded-sm overflow-hidden bg-muted mb-3">
                             {post.coverImageUrl ? (
                                 <img
                                     src={post.coverImageUrl}

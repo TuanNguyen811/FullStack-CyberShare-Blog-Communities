@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Save, Send, X, Upload, Image as ImageIcon } from 'lucide-react';
 
 export default function EditPostPage() {
   const { id } = useParams();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, canWrite } = useAuth();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
@@ -29,15 +29,58 @@ export default function EditPostPage() {
   const coverImageInputRef = useRef(null);
   const editorRef = useRef(null);
 
+  const patchMdeBoldBehavior = useCallback((mde) => {
+    if (!mde || mde.__cybershareBoldPatched) return;
+
+    const originalToggleBold = typeof mde.toggleBold === 'function' ? mde.toggleBold.bind(mde) : null;
+    if (!originalToggleBold || !mde.codemirror) return;
+
+    mde.toggleBold = () => {
+      const cm = mde.codemirror;
+      const selection = cm.getSelection();
+      const trailingMatch = selection.match(/(\r?\n)+$/);
+
+      if (!trailingMatch) {
+        originalToggleBold();
+        return;
+      }
+
+      const trailingLen = trailingMatch[0].length;
+      const core = selection.slice(0, selection.length - trailingLen);
+
+      if (!core) {
+        originalToggleBold();
+        return;
+      }
+
+      const from = cm.getCursor('from');
+      const to = cm.getCursor('to');
+      const toIndex = cm.indexFromPos(to);
+      const adjustedTo = cm.posFromIndex(Math.max(0, toIndex - trailingLen));
+
+      cm.setSelection(from, adjustedTo);
+      originalToggleBold();
+    };
+
+    mde.__cybershareBoldPatched = true;
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
 
+    // Check if user has permission to edit posts
+    if (!canWrite) {
+      navigate('/');
+      alert('Bạn cần có quyền AUTHOR hoặc ADMIN để chỉnh sửa bài viết.');
+      return;
+    }
+
     fetchPost();
     fetchCategories();
-  }, [id, isAuthenticated, navigate]);
+  }, [id, isAuthenticated, canWrite, navigate]);
 
   const fetchPost = async () => {
     try {
@@ -335,7 +378,10 @@ export default function EditPostPage() {
               value={content}
               onChange={setContent}
               options={editorOptions}
-              ref={editorRef}
+              getMdeInstance={(mde) => {
+                editorRef.current = mde;
+                patchMdeBoldBehavior(mde);
+              }}
             />
           </div>
 

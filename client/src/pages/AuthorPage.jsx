@@ -153,7 +153,7 @@ export default function AuthorPage() {
                   <div className="flex justify-center gap-2 mt-8 pt-8 border-t">
                     <Button
                       variant="outline"
-                      onClick={() => setPage((p) => Math.max(0, p - 1))}
+                      onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                       disabled={page === 0}
                     >
                       Previous
@@ -163,7 +163,7 @@ export default function AuthorPage() {
                     </span>
                     <Button
                       variant="outline"
-                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                      onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                       disabled={page >= totalPages - 1}
                     >
                       Next

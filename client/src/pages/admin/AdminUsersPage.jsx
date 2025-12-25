@@ -140,6 +140,7 @@ export default function AdminUsersPage() {
           >
             <option value="">All Roles</option>
             <option value="USER">User</option>
+            <option value="AUTHOR">Author</option>
             <option value="ADMIN">Admin</option>
           </select>
           <Button type="submit">
@@ -231,9 +232,12 @@ export default function AdminUsersPage() {
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full ${
                         user.role === 'ADMIN'
                           ? 'bg-purple-100 text-purple-700'
+                          : user.role === 'AUTHOR'
+                          ? 'bg-blue-100 text-blue-700'
                           : 'bg-gray-100 text-gray-700'
                       }`}>
                         {user.role === 'ADMIN' && <Shield className="h-3 w-3" />}
+                        {user.role === 'AUTHOR' && <UserCog className="h-3 w-3" />}
                         {user.role}
                       </span>
                     </td>
@@ -297,21 +301,33 @@ export default function AdminUsersPage() {
                                 </button>
                               )}
                               <hr className="my-1" />
-                              {user.role === 'USER' ? (
-                                <button
-                                  onClick={() => updateUserRole(user.id, 'ADMIN')}
-                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-purple-600 hover:bg-purple-50"
-                                >
-                                  <Shield className="h-4 w-4" />
-                                  Make Admin
-                                </button>
-                              ) : (
+                              {/* Role Management */}
+                              <div className="px-4 py-1 text-xs text-gray-400 uppercase">Change Role</div>
+                              {user.role !== 'USER' && (
                                 <button
                                   onClick={() => updateUserRole(user.id, 'USER')}
                                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                                 >
                                   <ShieldOff className="h-4 w-4" />
-                                  Remove Admin
+                                  Set as User
+                                </button>
+                              )}
+                              {user.role !== 'AUTHOR' && (
+                                <button
+                                  onClick={() => updateUserRole(user.id, 'AUTHOR')}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                                >
+                                  <UserCog className="h-4 w-4" />
+                                  Set as Author
+                                </button>
+                              )}
+                              {user.role !== 'ADMIN' && (
+                                <button
+                                  onClick={() => updateUserRole(user.id, 'ADMIN')}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-purple-600 hover:bg-purple-50"
+                                >
+                                  <Shield className="h-4 w-4" />
+                                  Set as Admin
                                 </button>
                               )}
                             </div>
